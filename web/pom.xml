@@ -1,0 +1,162 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+<parent>
+	<groupId>com.github.conanzhangxin</groupId>
+	<artifactId>discovery</artifactId>
+	<version>1.0</version>
+</parent>
+
+<modelVersion>4.0.0</modelVersion>
+<groupId>com.github.conanzhangxin.discovery</groupId>
+<artifactId>discovery-web</artifactId>
+<version>1.0</version>
+<packaging>war</packaging>
+
+
+
+
+
+<properties>
+	<warExplodedDirectory>target/exploded/${artifactId}.war</warExplodedDirectory>
+	<webx3-version>3.0.7</webx3-version>
+	<props.dir>${user.home}/antx.properties</props.dir>
+	</properties>
+
+
+
+<build>
+	<finalName>${artifactId}</finalName>
+	<filters>
+		<filter>${props.dir}</filter>
+	</filters>
+	
+	<resources>
+		<resource>
+			<directory>src/main/resources</directory>
+			<filtering>true</filtering>
+		</resource>
+	</resources>
+	
+	<plugins>
+		
+		    <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <configuration>
+                    <projectnatures>
+                        <java.lang.String>
+                            com.genuitec.eclipse.j2eedt.core.webnature
+                        </java.lang.String>
+                        <java.lang.String>
+                            org.eclipse.jdt.core.javanature
+                        </java.lang.String>
+                    </projectnatures>
+                    <outputDirectory>
+                        src/main/webapp/WEB-INF/classes
+                    </outputDirectory>
+                </configuration>
+            </plugin>
+		
+		
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-war-plugin</artifactId>
+			<configuration>
+				<webappDirectory>${warExplodedDirectory}</webappDirectory>
+				<webResources>
+					<resource>
+						<filtering>true</filtering>
+						<directory>${basedir}/src/main/webapp/WEB-INF</directory>
+						<includes>
+							<include>**/*.xml</include>
+						</includes>
+						<targetPath>WEB-INF</targetPath>
+					</resource>
+				</webResources>
+			</configuration>
+		</plugin>  
+		
+		<plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                	<execution>
+						<phase>package</phase>
+                		<configuration>
+                			<tasks>
+								<!--copy file="${props.dir}" tofile="src/main/resources/config.properties"/-->
+                				<copy file="${props.dir}" tofile="${warExplodedDirectory}/WEB-INF/classes/config.properties"/>
+                				<echo>props.dir=${props.dir} --- ${warExplodedDirectory}</echo>
+                			</tasks>
+                		</configuration>
+                		<goals>
+                			<goal>run</goal>
+                		</goals>
+						<!--
+                		<phase>package</phase>
+                		<configuration>
+                			<tasks>
+                				<copy file="${props.dir}" tofile="src/main/webapp/WEB-INF/classes/config.properties"/>
+                			</tasks>
+                		</configuration>
+                		<goals>
+                			<goal>run</goal>
+                		</goals>
+						-->
+                	</execution>
+                </executions>
+                <configuration>
+                    <projectnatures>
+                        <java.lang.String>
+                            com.genuitec.eclipse.j2eedt.core.webnature
+                        </java.lang.String>
+                        <java.lang.String>
+                            org.eclipse.jdt.core.javanature
+                        </java.lang.String>
+                    </projectnatures>
+                    <outputDirectory>
+                        src/main/webapp/WEB-INF/classes
+                    </outputDirectory>
+                </configuration>
+        </plugin>  
+		
+		<plugin>
+			  <groupId>org.mortbay.jetty</groupId>
+			  <artifactId>jetty-maven-plugin</artifactId>
+			  <configuration>
+				<scanIntervalSeconds>10</scanIntervalSeconds>
+				<webApp>
+				  <contextPath>/</contextPath>
+				</webApp>
+			  </configuration>
+		</plugin>
+
+	</plugins>
+</build>
+
+<dependencies>
+
+	<dependency>
+		<groupId>com.github.conanzhangxin.discovery</groupId>
+		<artifactId>discovery-biz</artifactId>
+		<version>1.0</version>
+	</dependency>
+	
+
+	<dependency>
+		<groupId>com.alibaba.citrus</groupId>
+		<artifactId>citrus-webx-all</artifactId>
+		<version>${webx3-version}</version>
+	</dependency>
+	
+			<!--servlet-->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+		</dependency>
+
+	
+</dependencies>
+
+</project>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+ 
+    <appender name="APPENDER_INFO" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="${loggingRoot}/logs/${localHost}/Team-info.log" />
+        <param name="threshold" value="debug"/>
+        <param name="encoding" value="GBK" />
+        <param name="append" value="true" />
+        <!-- Rollover at midnight each day -->
+     	<param name="DatePattern" value="'.'yyyy-MM-dd"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%n%-4r [%d{yyyy-MM-dd HH:mm:ss}] [%X{requestURIWithQueryString}] %-5p %c{2} - %m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+        <param name="threshold" value="info"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                   value="[%d{dd HH:mm:ss,SSS\} %-5p] [%t] %c{2\} - %m%n"/>
+        </layout>
+    </appender>
+    
+    <appender name="APPENDER_ERROR" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="${loggingRoot}/logs/${localHost}/Team-error.log" />
+        <param name="threshold" value="error"/>
+        <param name="encoding" value="GBK" />
+        <param name="append" value="true" />
+        <!-- Rollover at midnight each day -->
+     	<param name="DatePattern" value="'.'yyyy-MM-dd"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%n%-4r [%d{yyyy-MM-dd HH:mm:ss}] [%X{requestURIWithQueryString}] %-5p %c{2} - %m%n"/>
+        </layout>
+    </appender>
+
+	<appender name="APPENDER_IBATIS" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="${loggingRoot}/logs/${localHost}/Team-ibatis.log"/>
+        <param name="append" value="true"/>
+        <param name="threshold" value="${sqlLoggingLevel}"/>
+        <param name="encoding" value="GBK"/>
+        <!-- Rollover at midnight each day -->
+     	<param name="DatePattern" value="'.'yyyy-MM-dd"/>
+        <layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p %c{2} - %m%n"/>
+        </layout>
+    </appender>
+
+	<logger name="org.springframework" additivity="false">
+        <level value="info" />  
+        <appender-ref ref="APPENDER_INFO" />
+        <appender-ref ref="APPENDER_ERROR" />
+    </logger>
+    
+    <logger name="java.sql" additivity="false">
+        <level value="info" /> 
+        <appender-ref ref="APPENDER_IBATIS" />
+        <appender-ref ref="APPENDER_ERROR" />
+    </logger>   
+       
+    <logger name="com.ibatis" additivity="false"> 
+        <level value="${sql_logging_level}" />   
+        <appender-ref ref="APPENDER_IBATIS" />
+        <appender-ref ref="APPENDER_ERROR" />
+    </logger>
+
+       
+    <root>
+        <level value="${default_logging_level}" />
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="APPENDER_INFO" />
+        <appender-ref ref="APPENDER_ERROR" />
+    </root>
+</log4j:configuration>

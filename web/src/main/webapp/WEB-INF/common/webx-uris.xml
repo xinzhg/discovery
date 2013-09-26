@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="GBK" ?>
+<beans:beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:services="http://www.alibaba.com/schema/services" xmlns:uris="http://www.alibaba.com/schema/services/uris"
+	xmlns="http://www.alibaba.com/schema/services/uris"
+	xmlns:uri-interceptors="http://www.alibaba.com/schema/services/uris/interceptors"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+        http://www.alibaba.com/schema/services http://localhost:8080/schema/services.xsd
+        http://www.alibaba.com/schema/services/uris http://localhost:8080/schema/services-uris.xsd
+        http://www.alibaba.com/schema/services/uris/interceptors http://localhost:8080/schema/services-uris-interceptors.xsd
+        http://www.springframework.org/schema/beans http://localhost:8080/schema/www.springframework.org/schema/beans/spring-beans.xsd
+    ">
+
+	<services:uris>
+		<uri id="server" />
+		<turbine-uri id="homeModule" exposed="true" extends="server">
+			<componentPath>/</componentPath>
+		</turbine-uri>
+        <turbine-uri id="adminModule" exposed="true" extends="server">
+            <componentPath>/admin</componentPath>
+        </turbine-uri>		
+        <turbine-uri id="userModule" exposed="true" extends="server">
+            <componentPath>/user</componentPath>
+        </turbine-uri>	
+		<turbine-uri id="homeIndexLink" exposed="true" extends="homeModule">
+			<target>index.htm</target>
+		</turbine-uri>
+		
+ 		<turbine-content-uri id="homeContent" exposed="true" extends="server" >
+ 			<componentPath>/home</componentPath>
+ 		</turbine-content-uri>
+
+		<!-- taobao login page  -->
+		<content-uri id="memberServer" exposed="true">
+			<serverURI>https://login.${taobao.domain.name}</serverURI>
+		</content-uri>
+		<turbine-uri id="memberModule" exposed="true" extends="memberServer">
+	        <contextPath>/</contextPath>
+	    	<componentPath>member</componentPath>
+	    </turbine-uri>
+	    <turbine-uri id="memberLoginLink" exposed="true" extends="memberModule">
+	        <target>login.jhtml</target>
+	    </turbine-uri>
+		
+	</services:uris>
+
+</beans:beans>
