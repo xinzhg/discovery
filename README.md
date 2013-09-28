@@ -14,3 +14,5 @@
 
 在项目根目录下运行mvn clean install，然后cd web，运行mvn jetty:run
 
+访问 http://localhost:8080/index.htm?name=123
+
