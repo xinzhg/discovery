@@ -3,12 +3,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>Team</groupId>
-		<artifactId>productcode</artifactId>
+		<groupId>com.github.conanzhangxin</groupId>
+		<artifactId>discovery</artifactId>
 		<version>1.0</version>
 	</parent>
 	
-    <artifactId>productcode-deploy</artifactId>
+    <artifactId>discovery-deploy</artifactId>
     <packaging>pom</packaging>
     <name>Project Deploy</name>
     <version>1.0</version>

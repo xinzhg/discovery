@@ -1,4 +1,4 @@
-package com.github.conanzhangxin.web.home.module.screen;
+package com.github.conanzhangxin.discovery.web.home.module.screen;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
