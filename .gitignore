@@ -1,6 +1,8 @@
 .#*
 #*
-biz/*
-target/*
-web/*
-deploy/*
+biz/target
+target
+web/target
+deploy/target
+*.iml
+.idea

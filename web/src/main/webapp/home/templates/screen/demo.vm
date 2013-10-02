@@ -1,0 +1,6 @@
+submit content is $param
+<br/>
+<form action="demo.htm" method="post">
+    <input name="param" value="" type="text"/>
+    <input name="submit" type="submit"/>
+</form>

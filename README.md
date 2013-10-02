@@ -16,3 +16,22 @@
 
 访问 http://localhost:8080/index.htm?name=123
 
+
+### 文件结构 ###
+
+biz---业务代码区
+
+web---页面逻辑代码区
+
+### 文件命名方式 ###
+
+java文件---首字母大写，后面字母采用驼峰
+
+例如：Demo.java , DemoPage.java 等
+
+vm文件---首字母小写，后面字母采用驼峰
+
+例如：demo.vm , demoPage.vm
+
+
+
