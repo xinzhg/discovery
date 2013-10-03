@@ -33,5 +33,8 @@ vm文件---首字母小写，后面字母采用驼峰
 
 例如：demo.vm , demoPage.vm
 
+### 引用 reference ###
+
+存储：http://developer.baidu.com/wiki/index.php?title=docs/pcs/rest/file_data_apis_list
 
 
