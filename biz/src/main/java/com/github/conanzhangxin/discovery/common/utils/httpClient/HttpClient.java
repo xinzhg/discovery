@@ -18,4 +18,6 @@ public interface HttpClient {
     String getAFile(String key) throws DiscoveryException;
 
     String deleteAFile(String key) throws DiscoveryException;
+
+    String getQuota(String accessToken) throws DiscoveryException;
 }
