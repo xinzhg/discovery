@@ -7,5 +7,6 @@ package com.github.conanzhangxin.discovery.dataobject;
  * Time: обнГ11:20
  * To change this template use File | Settings | File Templates.
  */
-public class HttpResult {
+public class HttpTokenResult extends BasicHttpResult {
+
 }
