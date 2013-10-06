@@ -1,6 +1,7 @@
 package com.github.conanzhangxin.discovery.common.utils.httpClient;
 
 import com.github.conanzhangxin.discovery.common.exception.DiscoveryException;
+import com.github.conanzhangxin.discovery.dataobject.HttpTokenResult;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,7 +12,7 @@ import com.github.conanzhangxin.discovery.common.exception.DiscoveryException;
  */
 public interface HttpClient {
 
-    String getAccessToken() throws DiscoveryException;
+    HttpTokenResult getAccessToken() throws DiscoveryException;
 
     String pushAFile(String fileContent) throws DiscoveryException;
 
