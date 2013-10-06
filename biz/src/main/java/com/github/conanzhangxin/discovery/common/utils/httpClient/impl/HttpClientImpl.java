@@ -1,7 +1,10 @@
 package com.github.conanzhangxin.discovery.common.utils.httpClient.impl;
 
 import com.github.conanzhangxin.discovery.common.exception.DiscoveryException;
+import com.github.conanzhangxin.discovery.common.utils.CamelCaseUtil;
 import com.github.conanzhangxin.discovery.common.utils.httpClient.HttpClient;
+import com.github.conanzhangxin.discovery.dataobject.BasicHttpResult;
+import com.github.conanzhangxin.discovery.dataobject.HttpTokenResult;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 import org.apache.http.*;
@@ -13,6 +16,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.*;
 import org.apache.http.util.EntityUtils;
 
+import java.lang.reflect.Method;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +68,9 @@ public class HttpClientImpl implements HttpClient {
 
             System.out.println("Response: " + response.getStatusLine());
 
-            System.out.println(EntityUtils.toString(response.getEntity()));
+            String tmpResp = EntityUtils.toString(response.getEntity());
+
+            System.out.println(tmpResp);
 
             if (!connStrategy.keepAlive(response, coreContext)) {
                 conn.close();
@@ -72,7 +78,7 @@ public class HttpClientImpl implements HttpClient {
                 System.out.println("Connection kept alive...");
             }
 
-            return EntityUtils.toString(response.getEntity());
+            return tmpResp;
 
         } catch (Exception e) {
             throw new DiscoveryException(e);
@@ -84,6 +90,8 @@ public class HttpClientImpl implements HttpClient {
     public static void main (String[] args) {
         try {
 //            prototypeConnector() ;
+            HttpTokenResult httpTokenResult = getAccessToken1();
+            httpTokenResult.toString();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e);
@@ -93,31 +101,29 @@ public class HttpClientImpl implements HttpClient {
 
     @Override
     public String deleteAFile(String key) throws DiscoveryException {
-        prototypeConnector(POST , )
-
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public String getQuota(String accessToken) throws DiscoveryException {
-        prototypeConnector()
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    @Override
-    public String getAccessToken() throws DiscoveryException {
+    public static HttpTokenResult getAccessToken1() throws DiscoveryException {
         List<NameValuePair> data = new ArrayList<NameValuePair>();
         data.add(new BasicNameValuePair("grant_type","client_credentials"));
         data.add(new BasicNameValuePair("client_id",BAIDU_APPLICATION_CLIENT_ID));
         data.add(new BasicNameValuePair("client_secret",BAIDU_APPLICATION_CLIENT_SECRET));
         try {
             String json = prototypeProcessor(POST, BAIDU_OPENAPI_HOST, BAIDU_ACCESS_TOKEN_REQ_PATH, data);
-            JSONObject jsonObject = (JSONObject)JSONSerializer.toJSON(json);
-            jsonObject.get()
+            return covertJson2XResult(HttpTokenResult.class , json);
         } catch (Exception e) {
             throw new DiscoveryException(e);
         }
+    }
 
+    @Override
+    public HttpTokenResult getAccessToken() throws DiscoveryException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -130,4 +136,38 @@ public class HttpClientImpl implements HttpClient {
     public String getAFile(String key) throws DiscoveryException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
+
+    /**
+     * the method is applicable for once(root) level http response json
+     * @param clazz
+     * @param json
+     * @param <T>
+     * @return
+     * @throws Exception
+     */
+    public static <T extends BasicHttpResult> T covertJson2XResult(Class<T> clazz , String json) throws Exception {
+        T httpResult = clazz.newInstance();
+        JSONObject jsonObject = (JSONObject)JSONSerializer.toJSON(json);
+        Method[] methods = clazz.getMethods();
+        for (Method aMethod : methods) {
+            if (aMethod.getName().startsWith("set")) {
+                try {
+                    Object obj = jsonObject.get(CamelCaseUtil.toUnderScoreCase(aMethod.getName().substring(3)).toLowerCase());
+                    if (obj == null) continue;
+                    aMethod.invoke(httpResult , obj);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new Exception(e);
+                }
+
+            }
+        }
+        if (httpResult.getError() != null) {
+            httpResult.setSuccess(false);
+        }  else {
+            httpResult.setSuccess(true);
+        }
+        return httpResult;
+    }
+
 }
