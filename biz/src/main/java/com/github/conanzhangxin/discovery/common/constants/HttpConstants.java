@@ -1,5 +1,8 @@
 package com.github.conanzhangxin.discovery.common.constants;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 /**
  * Created with IntelliJ IDEA.
  * User: xinnan.zx
@@ -8,6 +11,20 @@ package com.github.conanzhangxin.discovery.common.constants;
  * To change this template use File | Settings | File Templates.
  */
 public class HttpConstants {
+
+    private static Properties getBaiduSercetKeyHelper() {
+        Properties p = new Properties();
+        try {
+            InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("baidu-secret-key.properties");
+            p.load(is);
+            is.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return p;
+    }
+
+    public static final Properties BAIDU_SECRET_KEY_PROPERTIES_HELPER =  getBaiduSercetKeyHelper();
 
     /**
      *  port 80
@@ -68,21 +85,21 @@ public class HttpConstants {
     /**
      * baidu application app key
      */
-    public static final String BAIDU_APPLICATION_APP_KEY = "123";
+    public static final String BAIDU_APPLICATION_APP_KEY = BAIDU_SECRET_KEY_PROPERTIES_HELPER.getProperty("BAIDU_APPLICATION_APP_KEY" , "");
 
     /**
      * baidu application client id
      */
-    public static final String BAIDU_APPLICATION_CLIENT_ID = BAIDU_APPLICATION_APP_KEY;
+    public static final String BAIDU_APPLICATION_CLIENT_ID = BAIDU_SECRET_KEY_PROPERTIES_HELPER.getProperty("BAIDU_APPLICATION_APP_KEY" , "");
 
     /**
      * baidu application app secret key
      */
-    public static final String BAIDU_APPLICATION_APP_SECRET_KEY = "abc";
+    public static final String BAIDU_APPLICATION_APP_SECRET_KEY = BAIDU_SECRET_KEY_PROPERTIES_HELPER.getProperty("BAIDU_APPLICATION_APP_SECRET_KEY" , "");
 
     /**
      * baidu application client_secret
      */
-    public static final String BAIDU_APPLICATION_CLIENT_SECRET = BAIDU_APPLICATION_APP_SECRET_KEY;
+    public static final String BAIDU_APPLICATION_CLIENT_SECRET = BAIDU_SECRET_KEY_PROPERTIES_HELPER.getProperty("BAIDU_APPLICATION_APP_SECRET_KEY" , "");
 
 }
