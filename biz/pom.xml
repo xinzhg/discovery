@@ -15,6 +15,19 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 
 <build>
 	<finalName>${artifactId}</finalName>
+    <resources>
+        <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+            <includes>
+                <include>**/*.xml</include>
+                <include>**/*.properties</include>
+            </includes>
+        </resource>
+    </resources>
+    <filters>
+        <filter>../filter/project-dev.properties</filter>
+    </filters>
 </build>
 
 <dependencies>
