@@ -2,6 +2,7 @@ package com.github.conanzhangxin.discovery.common.utils.httpClient;
 
 import com.github.conanzhangxin.discovery.common.exception.DiscoveryException;
 import com.github.conanzhangxin.discovery.dataobject.HttpTokenResult;
+import com.github.conanzhangxin.discovery.dataobject.QuotaResult;
 
 /**
  * Created with IntelliJ IDEA.
@@ -10,7 +11,7 @@ import com.github.conanzhangxin.discovery.dataobject.HttpTokenResult;
  * Time: ÏÂÎç9:07
  * To change this template use File | Settings | File Templates.
  */
-public interface HttpClient {
+public interface DiscoveryHttpClient {
 
     HttpTokenResult getAccessToken() throws DiscoveryException;
 
@@ -20,5 +21,5 @@ public interface HttpClient {
 
     String deleteAFile(String key) throws DiscoveryException;
 
-    String getQuota(String accessToken) throws DiscoveryException;
+    QuotaResult getQuota(String accessToken) throws DiscoveryException;
 }

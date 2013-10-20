@@ -69,7 +69,7 @@ public class HttpConstants {
     /**
      *  baidu oauth req path
      */
-    public static final String BAIDU_ACCESS_TOKEN_REQ_PATH = "/oauth/2.0/token";
+    public static final String BAIDU_ACCESS_TOKEN_REQ_PATH = "/oauth/2.0/authorize";
 
     /**
      * baidu application store quota req path
