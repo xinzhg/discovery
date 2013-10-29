@@ -12,6 +12,8 @@ import java.util.Properties;
  */
 public class HttpConstants {
 
+    public static final String UTF = "utf-8";
+
     private static Properties getBaiduSercetKeyHelper() {
         Properties p = new Properties();
         try {

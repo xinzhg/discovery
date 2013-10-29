@@ -1,5 +1,8 @@
 package com.github.conanzhangxin.discovery.common.utils.httpClient.impl;
 
+import com.github.conanzhangxin.discovery.common.baidu.utils.BaiduSignUtils;
+import com.github.conanzhangxin.discovery.common.constants.HttpConstants;
+import com.github.conanzhangxin.discovery.common.constants.StoreConstants;
 import com.github.conanzhangxin.discovery.common.exception.DiscoveryException;
 import com.github.conanzhangxin.discovery.common.utils.CamelCaseUtil;
 import com.github.conanzhangxin.discovery.common.utils.httpClient.DiscoveryHttpClient;
@@ -15,6 +18,8 @@ import org.apache.http.client.methods.*;
 import org.apache.http.conn.ssl.*;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.FileEntity;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.DefaultBHttpClientConnection;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -47,152 +52,19 @@ import static com.github.conanzhangxin.discovery.common.constants.HttpConstants.
 public class HttpClientImpl implements DiscoveryHttpClient {
 
 
-    private static String prototypeProcessor(String reqHttpMethod , String reqHost , String reqPath , List<NameValuePair> reqDataList) throws  Exception{
-        HttpProcessor httpproc = HttpProcessorBuilder.create()
-                .add(new RequestContent())
-                .add(new RequestTargetHost())
-                .add(new RequestConnControl())
-                .add(new RequestUserAgent("Test/1.1"))
-                .add(new RequestExpectContinue(true)).build();
-
-        HttpRequestExecutor httpexecutor = new HttpRequestExecutor();
-
-        HttpCoreContext coreContext = HttpCoreContext.create();
-        HttpHost host = new HttpHost(reqHost , 80 );
-        coreContext.setTargetHost(host);
-        DefaultBHttpClientConnection conn = new DefaultBHttpClientConnection(8 * 1024);
-        ConnectionReuseStrategy connStrategy = DefaultConnectionReuseStrategy.INSTANCE;
-
-        try {
-
-            HttpEntity[] requestBodies = {new UrlEncodedFormEntity(reqDataList , HTTP.UTF_8)};
-
-            if (!conn.isOpen()) {
-                Socket socket = new Socket(host.getHostName(), host.getPort());
-                conn.bind(socket);
-            }
-            BasicHttpEntityEnclosingRequest request = new BasicHttpEntityEnclosingRequest(reqHttpMethod ,
-                    reqPath );
-            request.setEntity(requestBodies[0]);
-            System.out.println("Request URI: " + request.getRequestLine().getUri());
-
-            httpexecutor.preProcess(request, httpproc, coreContext);
-            HttpResponse response = httpexecutor.execute(request, conn, coreContext);
-            httpexecutor.postProcess(response, httpproc, coreContext);
-
-            System.out.println("Response: " + response.getStatusLine());
-
-            String tmpResp = EntityUtils.toString(response.getEntity());
-
-            System.out.println(tmpResp);
-
-            if (!connStrategy.keepAlive(response, coreContext)) {
-                conn.close();
-            } else {
-                System.out.println("Connection kept alive...");
-            }
-
-            return tmpResp;
-
-        } catch (Exception e) {
-            throw new DiscoveryException(e);
-        } finally {
-            conn.close();
-        }
-    }
-
-
-    public static void initSSLContext(HttpClientBuilder httpClientBuilder) {
-        try {
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, new TrustManager[] { new X509TrustManager() {
-                @Override
-                public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-                }
-                @Override
-                public void checkServerTrusted(X509Certificate[] chain, String authType)
-                        throws CertificateException {
-                }
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-            } }, new SecureRandom());
-
-            SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sc , new X509HostnameVerifier(){
-                public boolean verify(String string,SSLSession ssls) {
-                    return true;
-                }
-
-                @Override
-                public void verify(String host, SSLSocket ssl) throws IOException {
-                    //To change body of implemented methods use File | Settings | File Templates.
-                }
-
-                @Override
-                public void verify(String host, X509Certificate cert) throws SSLException {
-                    //To change body of implemented methods use File | Settings | File Templates.
-                }
-
-                @Override
-                public void verify(String host, String[] cns, String[] subjectAlts) throws SSLException {
-                    //To change body of implemented methods use File | Settings | File Templates.
-                }
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[] {};
-                }
-            } );
-
-            httpClientBuilder.setSSLSocketFactory(sslConnectionSocketFactory);
-            httpClientBuilder.setSslcontext(sc);
-            httpClientBuilder.setSchemePortResolver(DefaultSchemePortResolver.INSTANCE);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-    public static String prototypeHttpsProcessor(String reqHttpMethod , String reqHost , String reqPath , List<NameValuePair> reqDataList) throws Exception {
-
-        SSLSocketFactory.getSocketFactory().setHostnameVerifier(new AllowAllHostnameVerifier());
-//        HttpClient httpclient = HttpClientBuilder.create().build();
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-        initSSLContext(httpClientBuilder);
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("https://").append(reqHost).append(reqPath).append("?");
-        for (NameValuePair nameValuePair : reqDataList) {
-            stringBuilder.append(nameValuePair.getName()).append("=").append(nameValuePair.getValue()).append("&");
-        }
-        HttpGet httpget = new HttpGet(stringBuilder.toString());
-        HttpClient httpclient = httpClientBuilder.build();
-        HttpEntity[] requestBodies = {new UrlEncodedFormEntity(reqDataList , HTTP.UTF_8)};
-        BasicHttpEntityEnclosingRequest request = new BasicHttpEntityEnclosingRequest(reqHttpMethod ,
-                reqPath );
-        request.setEntity(requestBodies[0]);
-
-        HttpHost httpHost = new HttpHost(reqHost , 443 , "https");
-
-        HttpResponse response = httpclient.execute(httpget);
-        String tmpResp = EntityUtils.toString(response.getEntity());
-        System.out.println(tmpResp);
-        return   tmpResp;
-    }
-
-    public static String prototypeHttpsPutProcessor(String reqHost , String reqPath , List<NameValuePair> reqDataList) throws Exception {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("http://bcs.duapp.com/discoverymaster/%2Fdiscoverymaster?sign=MBO:1775424a7fa49bcb02c88d62d76301f7:Q0iLKNWip4kP6dREi%2BAulcamTsY%3D");
-        HttpPut httpPut = new HttpPut(stringBuilder.toString());
-        httpPut.setEntity(new FileEntity(new File(Thread.currentThread().getContextClassLoader().getResource("test.properties").toURI())));
+    public static String prototypeHttpsPutProcessor(String fileKey , String content) throws Exception {
+        String sign =  BaiduSignUtils.generateSign("PUT", StoreConstants.STORE_BUCKET_MASTER, fileKey, null , null , null );
+        HttpPut httpPut = new HttpPut(sign);
+        httpPut.setEntity(new StringEntity(content, HttpConstants.UTF));
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
         HttpClient httpclient = httpClientBuilder.build();
         HttpResponse httpResponse = httpclient.execute(httpPut);
         return httpResponse.getEntity().getContent().toString();
     }
 
-    public static String prototypeHttpsGetListProcessor(String reqHost , String reqPath , List<NameValuePair> reqDataList) throws Exception {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("http://bcs.duapp.com/discoverymaster/%2Fdiscoverymaster?sign=MBO:1775424a7fa49bcb02c88d62d76301f7:mT3rX0y38BEJb06BIj1DuqmL%2F%2B8%3D"+"&start=0&limit=100");
-        HttpGet httpGet = new HttpGet(stringBuilder.toString());
+    public static String prototypeHttpsGetListProcessor() throws Exception {
+        String sign =  BaiduSignUtils.generateSign(GET, StoreConstants.STORE_BUCKET_MASTER, "/", null , null , null );
+        HttpGet httpGet = new HttpGet(sign);
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
         HttpClient httpclient = httpClientBuilder.build();
         HttpResponse httpResponse = httpclient.execute(httpGet);
@@ -210,12 +82,36 @@ public class HttpClientImpl implements DiscoveryHttpClient {
         return sb.toString();
     }
 
+    public static String prototypeHttpsGetAFileProcessor(String fileKey) throws Exception {
+        String sign =  BaiduSignUtils.generateSign(GET, StoreConstants.STORE_BUCKET_MASTER, fileKey, null , null , null );
+        HttpGet httpGet = new HttpGet(sign);
+        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        HttpClient httpclient = httpClientBuilder.build();
+        HttpResponse httpResponse = httpclient.execute(httpGet);
+        InputStream inputStream =  httpResponse.getEntity().getContent();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + "/n");
+            }
+        }    catch (Exception e ) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
+
+
+
+
        //for test
         public static void main (String[] args) {
         try {
 //            prototypeConnector() ;
-            prototypeHttpsPutProcessor(null , null ,null);
-            prototypeHttpsGetListProcessor(null,null,null);
+            System.out.println(prototypeHttpsPutProcessor("/test1" , "asdasdasd"));
+            System.out.println(prototypeHttpsGetAFileProcessor("/test1"));
+            System.out.println(prototypeHttpsGetListProcessor());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -223,6 +119,10 @@ public class HttpClientImpl implements DiscoveryHttpClient {
         }
     }
 
+    @Override
+    public HttpTokenResult getAccessToken() throws DiscoveryException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 
     @Override
     public String deleteAFile(String key) throws DiscoveryException {
@@ -231,60 +131,7 @@ public class HttpClientImpl implements DiscoveryHttpClient {
 
     @Override
     public QuotaResult getQuota(String accessToken) throws DiscoveryException {
-        List<NameValuePair> data = new ArrayList<NameValuePair>();
-        data.add(new BasicNameValuePair("method","info"));
-        data.add(new BasicNameValuePair("access_token",accessToken));
-        try {
-            String json = prototypeProcessor(POST, BAIDU_OPENAPI_HOST, BAIDU_ACCESS_TOKEN_REQ_PATH, data);
-            return covertJson2XResult(QuotaResult.class , json);
-        } catch (Exception e) {
-            throw new DiscoveryException(e);
-        }
-    }
-
-    public static QuotaResult getQuota1(String accessToken) throws DiscoveryException {
-        List<NameValuePair> data = new ArrayList<NameValuePair>();
-        data.add(new BasicNameValuePair("method","info"));
-        data.add(new BasicNameValuePair("access_token",accessToken));
-        try {
-            String json = prototypeHttpsProcessor(GET, BAIDU_PCS_HOST, BAIDU_APPLICATION_QUOTA_REQ_PATH , data);
-            return covertJson2XResult(QuotaResult.class , json);
-        } catch (Exception e) {
-            throw new DiscoveryException(e);
-        }
-    }
-
-    @Deprecated
-    public static HttpTokenResult getAccessToken1() throws DiscoveryException {
-        List<NameValuePair> data = new ArrayList<NameValuePair>();
-        data.add(new BasicNameValuePair("grant_type","client_credentials"));
-        data.add(new BasicNameValuePair("client_id",BAIDU_APPLICATION_CLIENT_ID));
-        data.add(new BasicNameValuePair("client_secret",BAIDU_APPLICATION_CLIENT_SECRET));
-        data.add(new BasicNameValuePair("scope","netdisk"));
-        data.add(new BasicNameValuePair("response_type", "code"));
-        data.add(new BasicNameValuePair("redirect_uri", "oob"));
-
-
-        try {
-            String json = prototypeHttpsProcessor(POST, BAIDU_OPENAPI_HOST, BAIDU_ACCESS_TOKEN_REQ_PATH, data);
-            return covertJson2XResult(HttpTokenResult.class , json);
-        } catch (Exception e) {
-            throw new DiscoveryException(e);
-        }
-    }
-
-    @Override
-    public HttpTokenResult getAccessToken() throws DiscoveryException {
-        List<NameValuePair> data = new ArrayList<NameValuePair>();
-        data.add(new BasicNameValuePair("grant_type","client_credentials"));
-        data.add(new BasicNameValuePair("client_id",BAIDU_APPLICATION_CLIENT_ID));
-        data.add(new BasicNameValuePair("client_secret",BAIDU_APPLICATION_CLIENT_SECRET));
-        try {
-            String json = prototypeProcessor(POST, BAIDU_OPENAPI_HOST, BAIDU_ACCESS_TOKEN_REQ_PATH, data);
-            return covertJson2XResult(HttpTokenResult.class , json);
-        } catch (Exception e) {
-            throw new DiscoveryException(e);
-        }
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
