@@ -1,6 +1,43 @@
-submit content is $param
+#if($msg)
+status is $msg
+#end
 <br/>
+put a new file or override  t
 <form action="demo.htm" method="post">
-    <input name="param" value="" type="text"/>
+    <input name="filename" value="$!filename" type="text"/>
+    <input name="filecontent" value="$!filecontent"  type="text"/>
+    <input hidden="true" name="act" value="put"/>
     <input name="submit" type="submit"/>
 </form>
+<br/>
+get a file content
+<form action="demo.htm" method="post">
+    <input name="filename" value="$!filename" type="text"/>
+    <input hidden="true" name="act" value="getafile"/>
+    <input name="submit" type="submit"/>
+</form>
+<br/>
+get root level folder list
+<form action="demo.htm" method="post">
+    <input hidden="true" name="act" value="getlist"/>
+    <input name="submit" type="submit"/>
+</form>
+<br/>
+#if($folder)
+<table border="1">
+  <tr>
+    <th>num</th>
+    <th>filename</th>
+    <th>filecontent</th>
+  </tr>
+#foreach($object in $folder)
+  <tr>
+    <td>$velocityCount</td>
+    <td>$object.get("filename")</td>
+    <td>$object.get("filecontent")</td>
+  </tr>
+#end
+</table>
+<br/>
+
+#end

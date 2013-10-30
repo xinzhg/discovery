@@ -52,14 +52,14 @@ import static com.github.conanzhangxin.discovery.common.constants.HttpConstants.
 public class HttpClientImpl implements DiscoveryHttpClient {
 
 
-    public static String prototypeHttpsPutProcessor(String fileKey , String content) throws Exception {
+    public static boolean prototypeHttpsPutProcessor(String fileKey , String content) throws Exception {
         String sign =  BaiduSignUtils.generateSign("PUT", StoreConstants.STORE_BUCKET_MASTER, fileKey, null , null , null );
         HttpPut httpPut = new HttpPut(sign);
         httpPut.setEntity(new StringEntity(content, HttpConstants.UTF));
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
         HttpClient httpclient = httpClientBuilder.build();
         HttpResponse httpResponse = httpclient.execute(httpPut);
-        return httpResponse.getEntity().getContent().toString();
+        return httpResponse.getStatusLine().getStatusCode() == 200;
     }
 
     public static String prototypeHttpsGetListProcessor() throws Exception {
@@ -74,7 +74,7 @@ public class HttpClientImpl implements DiscoveryHttpClient {
         String line = null;
         try {
             while ((line = reader.readLine()) != null) {
-                sb.append(line + "/n");
+                sb.append(line);
             }
         }    catch (Exception e ) {
             e.printStackTrace();
@@ -89,6 +89,9 @@ public class HttpClientImpl implements DiscoveryHttpClient {
         HttpClient httpclient = httpClientBuilder.build();
         HttpResponse httpResponse = httpclient.execute(httpGet);
         InputStream inputStream =  httpResponse.getEntity().getContent();
+        if (httpResponse.getStatusLine().getStatusCode() != 200) {
+            return "";
+        }
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         StringBuilder sb = new StringBuilder();
         String line = null;
@@ -109,7 +112,7 @@ public class HttpClientImpl implements DiscoveryHttpClient {
         public static void main (String[] args) {
         try {
 //            prototypeConnector() ;
-            System.out.println(prototypeHttpsPutProcessor("/test1" , "asdasdasd"));
+            System.out.println(prototypeHttpsPutProcessor("/test1" , "asda11sdasd"));
             System.out.println(prototypeHttpsGetAFileProcessor("/test1"));
             System.out.println(prototypeHttpsGetListProcessor());
 
