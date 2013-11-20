@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<!--
+# Jiayi Liu @ Nov 20, 2013
+-->
+<html>
+    <head>
+        <title> File encryption </title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" type="text/css" href="css/dropzone.css">
+        <script type="text/javascript" src="js/demo.js"></script>
+        <script type="text/javascript" src="js/sjcl.js"></script>
+        <script type="text/javascript" src="js/dropzone.js"></script>
+    </head>
+    <body onload="loaded()">
+        <form id="theForm" onsubmit="return false;">
+            <input type="password" id="password" />
+            <br>
+            
+            <textarea id="entry1"> </textarea>
+            <br>
+            <textarea id="entry2"> </textarea>
+            <br>
+            <a href="javascript:doEncrypt()">encrypt</a>
+            <a href="javascript:doDecrypt()">decrypt</a>
+        </form>
+        
+        <br>
+        
+        <form action="getFile()" class="dropzone" id="my-awesome-dropzone"> </form>
+        
+        <br>
+        Copyright @ Jiayi Liu
+    </body>
+</html>
